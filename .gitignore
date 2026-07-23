@@ -1,0 +1,7 @@
+ems-frontend/
+bin/
+obj/
+.vs/
+*.user
+*.db
+*.sqlite3
