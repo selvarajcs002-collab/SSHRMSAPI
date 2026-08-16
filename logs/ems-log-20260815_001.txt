@@ -1,0 +1,616 @@
+2026-08-15 22:46:45.532 +05:30 [ERR] Failed executing DbCommand (106ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [EMS_Departments] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [Description] nvarchar(250) NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_EMS_Departments] PRIMARY KEY ([Id])
+);
+2026-08-15 22:46:45.629 +05:30 [WRN] Tables might already exist. There is already an object named 'EMS_Departments' in the database.
+2026-08-15 22:46:45.731 +05:30 [INF] Database successfully ensured.
+2026-08-15 22:46:46.488 +05:30 [INF] Executed DbCommand (73ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 7. Create EMS_Settings table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Settings]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Settings] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [Key] NVARCHAR(100) NOT NULL,
+        [Value] NVARCHAR(MAX) NOT NULL,
+        [Description] NVARCHAR(250) NULL,
+        [UpdatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Settings] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+END;
+2026-08-15 22:46:46.563 +05:30 [INF] Executed DbCommand (72ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- Alter EMS_Employees to add new columns if they do not exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'Email')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [Email] NVARCHAR(150) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'Designation')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [Designation] NVARCHAR(100) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'DepartmentName')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [DepartmentName] NVARCHAR(100) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'ProfilePicture')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [ProfilePicture] NVARCHAR(MAX) NULL;
+END;
+2026-08-15 22:46:46.636 +05:30 [INF] Executed DbCommand (67ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 8. Create EMS_Departments table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Departments]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Departments] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [Name] NVARCHAR(100) NOT NULL,
+        [Description] NVARCHAR(250) NULL,
+        [CreatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Departments] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+END;
+2026-08-15 22:46:46.719 +05:30 [INF] Executed DbCommand (81ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 9. Create EMS_Leaves table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Leaves]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Leaves] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [EmployeeId] UNIQUEIDENTIFIER NOT NULL,
+        [LeaveType] INT NOT NULL,
+        [StartDate] DATE NOT NULL,
+        [EndDate] DATE NOT NULL,
+        [Status] INT NOT NULL,
+        [Reason] NVARCHAR(250) NULL,
+        [CreatedAt] DATETIME2 NOT NULL,
+        [UpdatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Leaves] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_EMS_Leaves_EMS_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[EMS_Employees] ([Id]) ON DELETE CASCADE
+    );
+END;
+2026-08-15 22:46:46.791 +05:30 [INF] Executed DbCommand (70ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- =========================================================
+-- STORED PROCEDURES
+-- =========================================================
+
+-- 1. sp_EMS_RegisterEmployeeBasic
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_EMS_RegisterEmployeeBasic]') AND type in (N'P', N'PC'))
+BEGIN
+    DROP PROCEDURE [dbo].[sp_EMS_RegisterEmployeeBasic];
+END;
+2026-08-15 22:46:46.893 +05:30 [ERR] Failed executing DbCommand (97ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE PROCEDURE [dbo].[sp_EMS_RegisterEmployeeBasic]
+    @Id UNIQUEIDENTIFIER,
+    @EmployeeCode NVARCHAR(50),
+    @FirstName NVARCHAR(100),
+    @LastName NVARCHAR(100),
+    @AadhaarNumber NVARCHAR(20),
+    @PhoneNumber NVARCHAR(20),
+    @Address NVARCHAR(250),
+    @City NVARCHAR(100),
+    @State NVARCHAR(100),
+    @District NVARCHAR(100),
+    @Pincode NVARCHAR(10),
+    @PanNumber NVARCHAR(20) = NULL,
+    @BloodGroup NVARCHAR(5) = NULL,
+    @MaritalStatus NVARCHAR(20) = NULL,
+    @SalaryPerMonth DECIMAL(18,2) = 0,
+    @Referral NVARCHAR(100) = NULL,
+    @IsConfirmed BIT = 0,
+    @Status INT = 1,
+    @CreatedAt DATETIME2,
+    @UpdatedAt DATETIME2,
+    @Email NVARCHAR(150) = NULL,
+    @Designation NVARCHAR(100) = NULL,
+    @DepartmentName NVARCHAR(100) = NULL,
+    @ProfilePicture NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    INSERT INTO [dbo].[EMS_Employees] (
+        [Id], [EmployeeCode], [FirstName], [LastName], [AadhaarNumber], [PhoneNumber],
+        [Address], [City], [State], [District], [Pincode], [PanNumber], [BloodGroup],
+        [MaritalStatus], [SalaryPerMonth], [Referral], [IsConfirmed], [Status], [CreatedAt], [UpdatedAt],
+        [Email], [Designation], [DepartmentName], [ProfilePicture]
+    )
+    VALUES (
+        @Id, @EmployeeCode, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber,
+        @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup,
+        @MaritalStatus, @SalaryPerMonth, @Referral, @IsConfirmed, @Status, @CreatedAt, @UpdatedAt,
+        @Email, @Designation, @DepartmentName, @ProfilePicture
+    );
+END;
+2026-08-15 22:46:46.895 +05:30 [ERR] An error occurred while ensuring/creating the database and stored procedures.
+Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'SalaryPerMonth'.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__210_1(IAsyncResult result)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API\Program.cs:line 242
+ClientConnectionId:ff1a9633-072a-42f7-a806-8aa2de4c2fd5
+Error Number:207,State:1,Class:16
+2026-08-15 22:46:46.930 +05:30 [INF] EMS Clean API started successfully.
+2026-08-15 22:46:46.958 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-08-15 22:46:46.977 +05:30 [INF] PayrollArchivalService started.
+2026-08-15 22:46:47.763 +05:30 [INF] Attendance Archival Service is starting.
+2026-08-15 22:46:47.826 +05:30 [INF] Executed DbCommand (195ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-15 22:46:47.946 +05:30 [INF] Executed DbCommand (100ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-15 22:46:47.952 +05:30 [INF] Next archival check scheduled in 1.2200139462777777 hours.
+2026-08-15 22:46:48.164 +05:30 [ERR] Hosting failed to start
+System.IO.IOException: Failed to bind to address http://127.0.0.1:5263: address already in use.
+ ---> Microsoft.AspNetCore.Connections.AddressInUseException: Only one usage of each socket address (protocol/network address/port) is normally permitted.
+ ---> System.Net.Sockets.SocketException (10048): Only one usage of each socket address (protocol/network address/port) is normally permitted.
+   at System.Net.Sockets.Socket.UpdateStatusAfterSocketErrorAndThrowException(SocketError error, Boolean disconnectOnFailure, String callerName)
+   at System.Net.Sockets.Socket.DoBind(EndPoint endPointSnapshot, SocketAddress socketAddress)
+   at System.Net.Sockets.Socket.Bind(EndPoint localEP)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportOptions.CreateDefaultBoundListenSocket(EndPoint endpoint)
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketConnectionListener.Bind()
+   at Microsoft.AspNetCore.Server.Kestrel.Transport.Sockets.SocketTransportFactory.BindAsync(EndPoint endpoint, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Infrastructure.TransportManager.BindAsync(EndPoint endPoint, ConnectionDelegate connectionDelegate, EndpointConfig endpointConfig, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.<>c__DisplayClass28_0`1.<<StartAsync>g__OnBind|0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.BindEndpointAsync(ListenOptions endpoint, AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.LocalhostListenOptions.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.AddressBinder.AddressesStrategy.BindAsync(AddressBindContext context, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.BindAsync(CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerImpl.StartAsync[TContext](IHttpApplication`1 application, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync(CancellationToken cancellationToken)
+   at Microsoft.Extensions.Hosting.Internal.Host.<StartAsync>b__14_1(IHostedService service, CancellationToken token)
+   at Microsoft.Extensions.Hosting.Internal.Host.ForeachService[T](IEnumerable`1 services, CancellationToken token, Boolean concurrent, Boolean abortOnFirstException, List`1 exceptions, Func`3 operation)
+2026-08-15 22:46:48.196 +05:30 [ERR] BackgroundService failed
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at EMS.API.Jobs.PayrollArchivalService.ExecuteAsync(CancellationToken stoppingToken) in C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API\Jobs\PayrollArchivalService.cs:line 56
+   at Microsoft.Extensions.Hosting.Internal.Host.TryExecuteBackgroundServiceAsync(BackgroundService backgroundService)
+2026-08-15 22:46:48.196 +05:30 [ERR] BackgroundService failed
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at EMS.API.Services.AttendanceArchivalService.ExecuteAsync(CancellationToken stoppingToken) in C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API\AttendanceArchivalService.cs:line 51
+   at Microsoft.Extensions.Hosting.Internal.Host.TryExecuteBackgroundServiceAsync(BackgroundService backgroundService)
+2026-08-15 22:46:48.199 +05:30 [FTL] The HostOptions.BackgroundServiceExceptionBehavior is configured to StopHost. A BackgroundService has thrown an unhandled exception, and the IHost instance is stopping. To avoid this behavior, configure this to Ignore; however the BackgroundService will not be restarted.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at EMS.API.Jobs.PayrollArchivalService.ExecuteAsync(CancellationToken stoppingToken) in C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API\Jobs\PayrollArchivalService.cs:line 56
+   at Microsoft.Extensions.Hosting.Internal.Host.TryExecuteBackgroundServiceAsync(BackgroundService backgroundService)
+2026-08-15 22:46:48.201 +05:30 [FTL] The HostOptions.BackgroundServiceExceptionBehavior is configured to StopHost. A BackgroundService has thrown an unhandled exception, and the IHost instance is stopping. To avoid this behavior, configure this to Ignore; however the BackgroundService will not be restarted.
+System.Threading.Tasks.TaskCanceledException: A task was canceled.
+   at EMS.API.Services.AttendanceArchivalService.ExecuteAsync(CancellationToken stoppingToken) in C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API\AttendanceArchivalService.cs:line 51
+   at Microsoft.Extensions.Hosting.Internal.Host.TryExecuteBackgroundServiceAsync(BackgroundService backgroundService)
+2026-08-15 22:48:19.300 +05:30 [ERR] Failed executing DbCommand (111ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [EMS_Departments] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [Description] nvarchar(250) NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_EMS_Departments] PRIMARY KEY ([Id])
+);
+2026-08-15 22:48:19.367 +05:30 [WRN] Tables might already exist. There is already an object named 'EMS_Departments' in the database.
+2026-08-15 22:48:19.470 +05:30 [INF] Database successfully ensured.
+2026-08-15 22:48:20.239 +05:30 [INF] Executed DbCommand (79ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 7. Create EMS_Settings table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Settings]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Settings] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [Key] NVARCHAR(100) NOT NULL,
+        [Value] NVARCHAR(MAX) NOT NULL,
+        [Description] NVARCHAR(250) NULL,
+        [UpdatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Settings] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+END;
+2026-08-15 22:48:20.332 +05:30 [INF] Executed DbCommand (88ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- Alter EMS_Employees to add new columns if they do not exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'Email')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [Email] NVARCHAR(150) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'Designation')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [Designation] NVARCHAR(100) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'DepartmentName')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [DepartmentName] NVARCHAR(100) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'ProfilePicture')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [ProfilePicture] NVARCHAR(MAX) NULL;
+END;
+2026-08-15 22:48:20.443 +05:30 [INF] Executed DbCommand (79ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 8. Create EMS_Departments table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Departments]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Departments] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [Name] NVARCHAR(100) NOT NULL,
+        [Description] NVARCHAR(250) NULL,
+        [CreatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Departments] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+END;
+2026-08-15 22:48:20.549 +05:30 [INF] Executed DbCommand (103ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 9. Create EMS_Leaves table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Leaves]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Leaves] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [EmployeeId] UNIQUEIDENTIFIER NOT NULL,
+        [LeaveType] INT NOT NULL,
+        [StartDate] DATE NOT NULL,
+        [EndDate] DATE NOT NULL,
+        [Status] INT NOT NULL,
+        [Reason] NVARCHAR(250) NULL,
+        [CreatedAt] DATETIME2 NOT NULL,
+        [UpdatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Leaves] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_EMS_Leaves_EMS_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[EMS_Employees] ([Id]) ON DELETE CASCADE
+    );
+END;
+2026-08-15 22:48:20.618 +05:30 [INF] Executed DbCommand (59ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- =========================================================
+-- STORED PROCEDURES
+-- =========================================================
+
+-- 1. sp_EMS_RegisterEmployeeBasic
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_EMS_RegisterEmployeeBasic]') AND type in (N'P', N'PC'))
+BEGIN
+    DROP PROCEDURE [dbo].[sp_EMS_RegisterEmployeeBasic];
+END;
+2026-08-15 22:48:20.729 +05:30 [ERR] Failed executing DbCommand (97ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE PROCEDURE [dbo].[sp_EMS_RegisterEmployeeBasic]
+    @Id UNIQUEIDENTIFIER,
+    @EmployeeCode NVARCHAR(50),
+    @FirstName NVARCHAR(100),
+    @LastName NVARCHAR(100),
+    @AadhaarNumber NVARCHAR(20),
+    @PhoneNumber NVARCHAR(20),
+    @Address NVARCHAR(250),
+    @City NVARCHAR(100),
+    @State NVARCHAR(100),
+    @District NVARCHAR(100),
+    @Pincode NVARCHAR(10),
+    @PanNumber NVARCHAR(20) = NULL,
+    @BloodGroup NVARCHAR(5) = NULL,
+    @MaritalStatus NVARCHAR(20) = NULL,
+    @SalaryPerMonth DECIMAL(18,2) = 0,
+    @Referral NVARCHAR(100) = NULL,
+    @IsConfirmed BIT = 0,
+    @Status INT = 1,
+    @CreatedAt DATETIME2,
+    @UpdatedAt DATETIME2,
+    @Email NVARCHAR(150) = NULL,
+    @Designation NVARCHAR(100) = NULL,
+    @DepartmentName NVARCHAR(100) = NULL,
+    @ProfilePicture NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    INSERT INTO [dbo].[EMS_Employees] (
+        [Id], [EmployeeCode], [FirstName], [LastName], [AadhaarNumber], [PhoneNumber],
+        [Address], [City], [State], [District], [Pincode], [PanNumber], [BloodGroup],
+        [MaritalStatus], [SalaryPerMonth], [Referral], [IsConfirmed], [Status], [CreatedAt], [UpdatedAt],
+        [Email], [Designation], [DepartmentName], [ProfilePicture]
+    )
+    VALUES (
+        @Id, @EmployeeCode, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber,
+        @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup,
+        @MaritalStatus, @SalaryPerMonth, @Referral, @IsConfirmed, @Status, @CreatedAt, @UpdatedAt,
+        @Email, @Designation, @DepartmentName, @ProfilePicture
+    );
+END;
+2026-08-15 22:48:20.731 +05:30 [ERR] An error occurred while ensuring/creating the database and stored procedures.
+Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'SalaryPerMonth'.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__210_1(IAsyncResult result)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API\Program.cs:line 242
+ClientConnectionId:4a84290e-ab20-4629-bfa3-a899046adb2f
+Error Number:207,State:1,Class:16
+2026-08-15 22:48:20.750 +05:30 [INF] EMS Clean API started successfully.
+2026-08-15 22:48:20.766 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-08-15 22:48:20.776 +05:30 [INF] PayrollArchivalService started.
+2026-08-15 22:48:21.108 +05:30 [INF] Attendance Archival Service is starting.
+2026-08-15 22:48:21.176 +05:30 [INF] Now listening on: http://localhost:5263
+2026-08-15 22:48:21.177 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-08-15 22:48:21.178 +05:30 [INF] Hosting environment: Development
+2026-08-15 22:48:21.179 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API
+2026-08-15 22:48:21.187 +05:30 [INF] Executed DbCommand (95ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-15 22:48:21.567 +05:30 [INF] Executed DbCommand (360ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-15 22:48:21.572 +05:30 [INF] Next archival check scheduled in 1.1940082307777777 hours.
+2026-08-15 22:48:38.304 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5263/api/ems/shifts/assignments - null null
+2026-08-15 22:48:38.304 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5263/api/ems/employees?pageNumber=1&pageSize=1000 - null null
+2026-08-15 22:48:38.304 +05:30 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5263/api/ems/leaves - null null
+2026-08-15 22:48:38.572 +05:30 [INF] CORS policy execution successful.
+2026-08-15 22:48:38.572 +05:30 [INF] CORS policy execution successful.
+2026-08-15 22:48:38.572 +05:30 [INF] CORS policy execution successful.
+2026-08-15 22:48:38.605 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5263/api/ems/shifts/assignments - 204 null null 304.6245ms
+2026-08-15 22:48:38.605 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5263/api/ems/leaves - 204 null null 304.6245ms
+2026-08-15 22:48:38.605 +05:30 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5263/api/ems/employees?pageNumber=1&pageSize=1000 - 204 null null 304.6245ms
+2026-08-15 22:48:38.617 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5263/api/ems/leaves - application/json null
+2026-08-15 22:48:38.621 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5263/api/ems/shifts/assignments - application/json null
+2026-08-15 22:48:38.627 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5263/api/ems/employees?pageNumber=1&pageSize=1000 - application/json null
+2026-08-15 22:48:38.650 +05:30 [INF] CORS policy execution successful.
+2026-08-15 22:48:38.650 +05:30 [INF] CORS policy execution successful.
+2026-08-15 22:48:38.650 +05:30 [INF] CORS policy execution successful.
+2026-08-15 22:48:38.910 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenMalformedException: IDX14100: JWT is not well formed, there are no dots (.).
+The token needs to be in JWS or JWE Compact Serialization Format. (JWS): 'EncodedHeader.EncodedPayload.EncodedSignature'. (JWE): 'EncodedProtectedHeader.EncodedEncryptedKey.EncodedInitializationVector.EncodedCiphertext.EncodedAuthenticationTag'.
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebToken.ReadToken(ReadOnlyMemory`1 encodedTokenMemory)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebToken..ctor(String jwtEncodedString)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ReadToken(String token, TokenValidationParameters validationParameters)
+2026-08-15 22:48:38.911 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenMalformedException: IDX14100: JWT is not well formed, there are no dots (.).
+The token needs to be in JWS or JWE Compact Serialization Format. (JWS): 'EncodedHeader.EncodedPayload.EncodedSignature'. (JWE): 'EncodedProtectedHeader.EncodedEncryptedKey.EncodedInitializationVector.EncodedCiphertext.EncodedAuthenticationTag'.
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebToken.ReadToken(ReadOnlyMemory`1 encodedTokenMemory)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebToken..ctor(String jwtEncodedString)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ReadToken(String token, TokenValidationParameters validationParameters)
+2026-08-15 22:48:38.911 +05:30 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenMalformedException: IDX14100: JWT is not well formed, there are no dots (.).
+The token needs to be in JWS or JWE Compact Serialization Format. (JWS): 'EncodedHeader.EncodedPayload.EncodedSignature'. (JWE): 'EncodedProtectedHeader.EncodedEncryptedKey.EncodedInitializationVector.EncodedCiphertext.EncodedAuthenticationTag'.
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebToken.ReadToken(ReadOnlyMemory`1 encodedTokenMemory)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebToken..ctor(String jwtEncodedString)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ReadToken(String token, TokenValidationParameters validationParameters)
+2026-08-15 22:48:39.057 +05:30 [INF] Bearer was not authenticated. Failure message: IDX14100: JWT is not well formed, there are no dots (.).
+The token needs to be in JWS or JWE Compact Serialization Format. (JWS): 'EncodedHeader.EncodedPayload.EncodedSignature'. (JWE): 'EncodedProtectedHeader.EncodedEncryptedKey.EncodedInitializationVector.EncodedCiphertext.EncodedAuthenticationTag'.
+2026-08-15 22:48:39.057 +05:30 [INF] Bearer was not authenticated. Failure message: IDX14100: JWT is not well formed, there are no dots (.).
+The token needs to be in JWS or JWE Compact Serialization Format. (JWS): 'EncodedHeader.EncodedPayload.EncodedSignature'. (JWE): 'EncodedProtectedHeader.EncodedEncryptedKey.EncodedInitializationVector.EncodedCiphertext.EncodedAuthenticationTag'.
+2026-08-15 22:48:39.057 +05:30 [INF] Bearer was not authenticated. Failure message: IDX14100: JWT is not well formed, there are no dots (.).
+The token needs to be in JWS or JWE Compact Serialization Format. (JWS): 'EncodedHeader.EncodedPayload.EncodedSignature'. (JWE): 'EncodedProtectedHeader.EncodedEncryptedKey.EncodedInitializationVector.EncodedCiphertext.EncodedAuthenticationTag'.
+2026-08-15 22:48:39.071 +05:30 [INF] Executing endpoint 'EMS.API.Controllers.RegisterEmpController.GetAllEmployees (EMS.API)'
+2026-08-15 22:48:39.071 +05:30 [INF] Executing endpoint 'EMS.API.Controllers.ShiftController.GetAllAssignments (EMS.API)'
+2026-08-15 22:48:39.071 +05:30 [INF] Executing endpoint 'EMS.API.Controllers.LeaveController.GetAll (EMS.API)'
+2026-08-15 22:48:39.114 +05:30 [INF] Route matched with {action = "GetAllEmployees", controller = "RegisterEmp"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllEmployees(Int32, Int32, System.String) on controller EMS.API.Controllers.RegisterEmpController (EMS.API).
+2026-08-15 22:48:39.114 +05:30 [INF] Route matched with {action = "GetAll", controller = "Leave"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAll() on controller EMS.API.Controllers.LeaveController (EMS.API).
+2026-08-15 22:48:39.114 +05:30 [INF] Route matched with {action = "GetAllAssignments", controller = "Shift"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllAssignments() on controller EMS.API.Controllers.ShiftController (EMS.API).
+2026-08-15 22:48:39.804 +05:30 [INF] Executed DbCommand (78ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[CreatedAt], [e].[EmployeeId], [e].[EndDate], [e].[LeaveType], [e].[Reason], [e].[StartDate], [e].[Status], [e].[UpdatedAt], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Leaves] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+ORDER BY [e].[CreatedAt] DESC
+2026-08-15 22:48:40.074 +05:30 [INF] Executing OkObjectResult, writing value of type 'EMS.Application.DTOs.ApiResponse`1[[System.Collections.Generic.List`1[[EMS.Application.DTOs.LeaveDto, EMS.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-08-15 22:48:40.242 +05:30 [INF] Executed DbCommand (77ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AssignmentDate], [e].[CreatedAt], [e].[EmployeeId], [e].[MachineAllocation], [e].[ShiftType], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Shifts] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+ORDER BY [e].[AssignmentDate] DESC
+2026-08-15 22:48:40.242 +05:30 [INF] Executed DbCommand (77ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*)
+FROM [EMS_Employees] AS [e]
+2026-08-15 22:48:40.257 +05:30 [INF] Executing OkObjectResult, writing value of type 'EMS.Application.DTOs.ApiResponse`1[[System.Collections.Generic.List`1[[EMS.Application.DTOs.ShiftAssignmentDto, EMS.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-08-15 22:48:40.263 +05:30 [INF] Executed action EMS.API.Controllers.LeaveController.GetAll (EMS.API) in 1135.7726ms
+2026-08-15 22:48:40.272 +05:30 [INF] Executed endpoint 'EMS.API.Controllers.LeaveController.GetAll (EMS.API)'
+2026-08-15 22:48:40.276 +05:30 [INF] Executed action EMS.API.Controllers.ShiftController.GetAllAssignments (EMS.API) in 1150.5852ms
+2026-08-15 22:48:40.279 +05:30 [INF] Executed endpoint 'EMS.API.Controllers.ShiftController.GetAllAssignments (EMS.API)'
+2026-08-15 22:48:40.280 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5263/api/ems/leaves - 200 null application/json; charset=utf-8 1662.0694ms
+2026-08-15 22:48:40.284 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5263/api/ems/shifts/assignments - 200 null application/json; charset=utf-8 1661.5835ms
+2026-08-15 22:48:40.352 +05:30 [INF] Executed DbCommand (64ms) [Parameters=[@__p_0='?' (DbType = Int32), @__p_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AadhaarNumber], [e].[Address], [e].[BloodGroup], [e].[City], [e].[CreatedAt], [e].[DateOfBirth], [e].[DepartmentName], [e].[Designation], [e].[District], [e].[Email], [e].[EmployeeCode], [e].[FirstName], [e].[Gender], [e].[IsConfirmed], [e].[LastName], [e].[MaritalStatus], [e].[Nationality], [e].[PanNumber], [e].[PerDaySalary], [e].[PhoneNumber], [e].[Pincode], [e].[ProfilePicture], [e].[Referral], [e].[State], [e].[Status], [e].[UpdatedAt]
+FROM [EMS_Employees] AS [e]
+ORDER BY [e].[CreatedAt] DESC
+OFFSET @__p_0 ROWS FETCH NEXT @__p_1 ROWS ONLY
+2026-08-15 22:48:40.358 +05:30 [INF] Executing OkObjectResult, writing value of type 'EMS.Application.DTOs.ApiResponse`1[[System.Collections.Generic.List`1[[EMS.Application.DTOs.EmployeeListDto, EMS.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=9.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-08-15 22:48:40.385 +05:30 [INF] Executed action EMS.API.Controllers.RegisterEmpController.GetAllEmployees (EMS.API) in 1264.9827ms
+2026-08-15 22:48:40.388 +05:30 [INF] Executed endpoint 'EMS.API.Controllers.RegisterEmpController.GetAllEmployees (EMS.API)'
+2026-08-15 22:48:40.391 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5263/api/ems/employees?pageNumber=1&pageSize=1000 - 200 null application/json; charset=utf-8 1763.1702ms
+2026-08-15 22:49:01.464 +05:30 [INF] Application is shutting down...
+2026-08-15 22:56:30.714 +05:30 [ERR] Failed executing DbCommand (90ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [EMS_Departments] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [Description] nvarchar(250) NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_EMS_Departments] PRIMARY KEY ([Id])
+);
+2026-08-15 22:56:30.910 +05:30 [WRN] Tables might already exist. There is already an object named 'EMS_Departments' in the database.
+2026-08-15 22:56:31.028 +05:30 [INF] Database successfully ensured.
+2026-08-15 22:56:31.709 +05:30 [INF] Executed DbCommand (78ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 6. Create EMS_Payrolls table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Payrolls]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Payrolls] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [EmployeeId] UNIQUEIDENTIFIER NOT NULL,
+        [Month] INT NOT NULL,
+        [Year] INT NOT NULL,
+        [BaseSalary] DECIMAL(18,2) NOT NULL,
+        [Incentives] DECIMAL(18,2) NOT NULL,
+        [Allowances] DECIMAL(18,2) NOT NULL,
+        [AdvancePayments] DECIMAL(18,2) NOT NULL,
+        [NetPayable] DECIMAL(18,2) NOT NULL,
+        [IsPaid] BIT NOT NULL,
+        [PaidDate] DATETIME2 NULL,
+        [PayslipFilePath] NVARCHAR(250) NULL,
+        [CreatedAt] DATETIME2 NOT NULL,
+        [UpdatedAt] DATETIME2 NULL,
+        CONSTRAINT [PK_EMS_Payrolls] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_EMS_Payrolls_EMS_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[EMS_Employees] ([Id]) ON DELETE CASCADE
+    );
+END;
+2026-08-15 22:56:31.799 +05:30 [INF] Executed DbCommand (74ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 7. Create EMS_Settings table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Settings]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Settings] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [Key] NVARCHAR(100) NOT NULL,
+        [Value] NVARCHAR(MAX) NOT NULL,
+        [Description] NVARCHAR(250) NULL,
+        [UpdatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Settings] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+END;
+2026-08-15 22:56:31.878 +05:30 [INF] Executed DbCommand (74ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- Alter EMS_Employees to add new columns if they do not exist
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'Email')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [Email] NVARCHAR(150) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'Designation')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [Designation] NVARCHAR(100) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'DepartmentName')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [DepartmentName] NVARCHAR(100) NULL;
+END;
+IF NOT EXISTS (SELECT * FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Employees]') AND name = N'ProfilePicture')
+BEGIN
+    ALTER TABLE [dbo].[EMS_Employees] ADD [ProfilePicture] NVARCHAR(MAX) NULL;
+END;
+2026-08-15 22:56:31.958 +05:30 [INF] Executed DbCommand (78ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 8. Create EMS_Departments table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Departments]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Departments] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [Name] NVARCHAR(100) NOT NULL,
+        [Description] NVARCHAR(250) NULL,
+        [CreatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Departments] PRIMARY KEY CLUSTERED ([Id] ASC)
+    );
+END;
+2026-08-15 22:56:32.048 +05:30 [INF] Executed DbCommand (87ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- 9. Create EMS_Leaves table
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[EMS_Leaves]') AND type in (N'U'))
+BEGIN
+    CREATE TABLE [dbo].[EMS_Leaves] (
+        [Id] UNIQUEIDENTIFIER NOT NULL,
+        [EmployeeId] UNIQUEIDENTIFIER NOT NULL,
+        [LeaveType] INT NOT NULL,
+        [StartDate] DATE NOT NULL,
+        [EndDate] DATE NOT NULL,
+        [Status] INT NOT NULL,
+        [Reason] NVARCHAR(250) NULL,
+        [CreatedAt] DATETIME2 NOT NULL,
+        [UpdatedAt] DATETIME2 NOT NULL,
+        CONSTRAINT [PK_EMS_Leaves] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_EMS_Leaves_EMS_Employees_EmployeeId] FOREIGN KEY ([EmployeeId]) REFERENCES [dbo].[EMS_Employees] ([Id]) ON DELETE CASCADE
+    );
+END;
+2026-08-15 22:56:32.150 +05:30 [INF] Executed DbCommand (82ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+-- =========================================================
+-- STORED PROCEDURES
+-- =========================================================
+
+-- 1. sp_EMS_RegisterEmployeeBasic
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[sp_EMS_RegisterEmployeeBasic]') AND type in (N'P', N'PC'))
+BEGIN
+    DROP PROCEDURE [dbo].[sp_EMS_RegisterEmployeeBasic];
+END;
+2026-08-15 22:56:32.229 +05:30 [ERR] Failed executing DbCommand (69ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE PROCEDURE [dbo].[sp_EMS_RegisterEmployeeBasic]
+    @Id UNIQUEIDENTIFIER,
+    @EmployeeCode NVARCHAR(50),
+    @FirstName NVARCHAR(100),
+    @LastName NVARCHAR(100),
+    @AadhaarNumber NVARCHAR(20),
+    @PhoneNumber NVARCHAR(20),
+    @Address NVARCHAR(250),
+    @City NVARCHAR(100),
+    @State NVARCHAR(100),
+    @District NVARCHAR(100),
+    @Pincode NVARCHAR(10),
+    @PanNumber NVARCHAR(20) = NULL,
+    @BloodGroup NVARCHAR(5) = NULL,
+    @MaritalStatus NVARCHAR(20) = NULL,
+    @SalaryPerMonth DECIMAL(18,2) = 0,
+    @Referral NVARCHAR(100) = NULL,
+    @IsConfirmed BIT = 0,
+    @Status INT = 1,
+    @CreatedAt DATETIME2,
+    @UpdatedAt DATETIME2,
+    @Email NVARCHAR(150) = NULL,
+    @Designation NVARCHAR(100) = NULL,
+    @DepartmentName NVARCHAR(100) = NULL,
+    @ProfilePicture NVARCHAR(MAX) = NULL
+AS
+BEGIN
+    INSERT INTO [dbo].[EMS_Employees] (
+        [Id], [EmployeeCode], [FirstName], [LastName], [AadhaarNumber], [PhoneNumber],
+        [Address], [City], [State], [District], [Pincode], [PanNumber], [BloodGroup],
+        [MaritalStatus], [SalaryPerMonth], [Referral], [IsConfirmed], [Status], [CreatedAt], [UpdatedAt],
+        [Email], [Designation], [DepartmentName], [ProfilePicture]
+    )
+    VALUES (
+        @Id, @EmployeeCode, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber,
+        @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup,
+        @MaritalStatus, @SalaryPerMonth, @Referral, @IsConfirmed, @Status, @CreatedAt, @UpdatedAt,
+        @Email, @Designation, @DepartmentName, @ProfilePicture
+    );
+END;
+2026-08-15 22:56:32.235 +05:30 [ERR] An error occurred while ensuring/creating the database and stored procedures.
+Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid column name 'SalaryPerMonth'.
+   at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at Microsoft.Data.SqlClient.SqlCommand.InternalEndExecuteNonQuery(IAsyncResult asyncResult, Boolean isInternal, String endMethod)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryInternal(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.EndExecuteNonQueryAsync(IAsyncResult asyncResult)
+   at Microsoft.Data.SqlClient.SqlCommand.<>c.<InternalExecuteNonQueryAsync>b__210_1(IAsyncResult result)
+   at System.Threading.Tasks.TaskFactory`1.FromAsyncCoreLogic(IAsyncResult iar, Func`2 endFunction, Action`1 endAction, Task`1 promise, Boolean requiresSynchronization)
+--- End of stack trace from previous location ---
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalCommand.ExecuteNonQueryAsync(RelationalCommandParameterObject parameterObject, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRawAsync(DatabaseFacade databaseFacade, String sql, IEnumerable`1 parameters, CancellationToken cancellationToken)
+   at Program.<Main>$(String[] args) in C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API\Program.cs:line 242
+ClientConnectionId:4d0f25ac-54fe-49c8-b6f6-7e3d8f82ec5e
+Error Number:207,State:1,Class:16
+2026-08-15 22:56:32.300 +05:30 [INF] EMS Clean API started successfully.
+2026-08-15 22:56:32.329 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-08-15 22:56:32.343 +05:30 [INF] PayrollArchivalService started.
+2026-08-15 22:56:33.233 +05:30 [INF] Attendance Archival Service is starting.
+2026-08-15 22:56:33.312 +05:30 [INF] Executed DbCommand (103ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-15 22:56:33.404 +05:30 [INF] Now listening on: http://localhost:5263
+2026-08-15 22:56:33.406 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-08-15 22:56:33.407 +05:30 [INF] Hosting environment: Development
+2026-08-15 22:56:33.408 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.API
+2026-08-15 22:56:33.430 +05:30 [INF] Executed DbCommand (96ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-15 22:56:33.438 +05:30 [INF] Next archival check scheduled in 1.0573793560555556 hours.
