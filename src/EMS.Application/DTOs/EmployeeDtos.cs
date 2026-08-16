@@ -7,21 +7,21 @@ namespace EMS.Application.DTOs
     public class EmployeeBasicDetailCreateDto
     {
         public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public string AadhaarNumber { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
-        public string City { get; set; } = string.Empty;
-        public string State { get; set; } = string.Empty;
-        public string District { get; set; } = string.Empty;
-        public string Pincode { get; set; } = string.Empty;
+        public string? LastName { get; set; }
+        public string? AadhaarNumber { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Address { get; set; }
+        public string? City { get; set; }
+        public string? State { get; set; }
+        public string? District { get; set; }
+        public string? Pincode { get; set; }
         public string? PanNumber { get; set; }
         public string? BloodGroup { get; set; }
         public string? MaritalStatus { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public string? Gender { get; set; }
         public string? Nationality { get; set; }
-        public decimal SalaryPerMonth { get; set; }
+        public decimal PerDaySalary { get; set; }
         public string? Referral { get; set; }
         public string? Email { get; set; }
         public string? Designation { get; set; }
@@ -88,7 +88,7 @@ namespace EMS.Application.DTOs
         public string City { get; set; } = string.Empty;
         public EmsEmployeeStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
-        public decimal SalaryPerMonth { get; set; }
+        public decimal PerDaySalary { get; set; }
         public string? Email { get; set; }
         public string? Designation { get; set; }
         public string? DepartmentName { get; set; }

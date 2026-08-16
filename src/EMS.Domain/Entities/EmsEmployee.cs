@@ -20,35 +20,27 @@ namespace EMS.Domain.Entities
         [MaxLength(100)]
         public string FirstName { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(100)]
         public string LastName { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(20)]
         public string AadhaarNumber { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(20)]
         public string PhoneNumber { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(250)]
         public string Address { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(100)]
         public string City { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(100)]
         public string State { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(100)]
         public string District { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(10)]
         public string Pincode { get; set; } = string.Empty;
 
@@ -70,7 +62,7 @@ namespace EMS.Domain.Entities
         public string? Nationality { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
-        public decimal SalaryPerMonth { get; set; }
+        public decimal PerDaySalary { get; set; }
 
         [MaxLength(100)]
         public string? Referral { get; set; }

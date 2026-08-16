@@ -34,7 +34,7 @@ BEGIN
         [PanNumber] NVARCHAR(20) NULL,
         [BloodGroup] NVARCHAR(5) NULL,
         [MaritalStatus] NVARCHAR(20) NULL,
-        [SalaryPerMonth] DECIMAL(18,2) NOT NULL,
+        [PerDaySalary] DECIMAL(18,2) NOT NULL,
         [Referral] NVARCHAR(100) NULL,
         [IsConfirmed] BIT NOT NULL,
         [Status] INT NOT NULL,
@@ -230,7 +230,7 @@ CREATE PROCEDURE [dbo].[sp_EMS_RegisterEmployeeBasic]
     @PanNumber NVARCHAR(20) = NULL,
     @BloodGroup NVARCHAR(5) = NULL,
     @MaritalStatus NVARCHAR(20) = NULL,
-    @SalaryPerMonth DECIMAL(18,2) = 0,
+    @PerDaySalary DECIMAL(18,2) = 0,
     @Referral NVARCHAR(100) = NULL,
     @IsConfirmed BIT = 0,
     @Status INT = 1,
@@ -245,13 +245,13 @@ BEGIN
     INSERT INTO [dbo].[EMS_Employees] (
         [Id], [EmployeeCode], [FirstName], [LastName], [AadhaarNumber], [PhoneNumber],
         [Address], [City], [State], [District], [Pincode], [PanNumber], [BloodGroup],
-        [MaritalStatus], [SalaryPerMonth], [Referral], [IsConfirmed], [Status], [CreatedAt], [UpdatedAt],
+        [MaritalStatus], [PerDaySalary], [Referral], [IsConfirmed], [Status], [CreatedAt], [UpdatedAt],
         [Email], [Designation], [DepartmentName], [ProfilePicture]
     )
     VALUES (
         @Id, @EmployeeCode, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber,
         @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup,
-        @MaritalStatus, @SalaryPerMonth, @Referral, @IsConfirmed, @Status, @CreatedAt, @UpdatedAt,
+        @MaritalStatus, @PerDaySalary, @Referral, @IsConfirmed, @Status, @CreatedAt, @UpdatedAt,
         @Email, @Designation, @DepartmentName, @ProfilePicture
     );
 END;
@@ -318,7 +318,7 @@ CREATE PROCEDURE [dbo].[sp_EMS_UpdateEmployee]
     @PanNumber NVARCHAR(20) = NULL,
     @BloodGroup NVARCHAR(5) = NULL,
     @MaritalStatus NVARCHAR(20) = NULL,
-    @SalaryPerMonth DECIMAL(18,2) = 0,
+    @PerDaySalary DECIMAL(18,2) = 0,
     @Referral NVARCHAR(100) = NULL,
     @Status INT,
     @IsConfirmed BIT,
@@ -343,7 +343,7 @@ BEGIN
         [PanNumber] = @PanNumber,
         [BloodGroup] = @BloodGroup,
         [MaritalStatus] = @MaritalStatus,
-        [SalaryPerMonth] = @SalaryPerMonth,
+        [PerDaySalary] = @PerDaySalary,
         [Referral] = @Referral,
         [Status] = @Status,
         [IsConfirmed] = @IsConfirmed,

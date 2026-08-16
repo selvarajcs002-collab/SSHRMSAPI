@@ -7,6 +7,7 @@ namespace EMS.Application.DTOs
         public decimal Incentives { get; set; }
         public decimal Allowances { get; set; }
         public decimal AdvancePayments { get; set; }
+        public decimal BaseSalary { get; set; }
     }
 
     public class PayrollDto
@@ -40,3 +41,4 @@ namespace EMS.Application.DTOs
         public int UnpaidCount { get; set; }
     }
 }
+

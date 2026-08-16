@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -188,7 +189,16 @@ if (app.Environment.IsDevelopment())
     try
     {
         // First ensure DB is created
-        await dbContext.Database.EnsureCreatedAsync();
+        var databaseCreator = dbContext.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
+        try
+        {
+            await databaseCreator.CreateTablesAsync();
+            Log.Information("Tables created successfully.");
+        }
+        catch (Microsoft.Data.SqlClient.SqlException ex)
+        {
+            Log.Warning("Tables might already exist. " + ex.Message);
+        }
 
         // Ensure missing columns exist (since EnsureCreated doesn't run migrations)
         var addColumnsSql = @"
@@ -196,6 +206,16 @@ if (app.Environment.IsDevelopment())
             BEGIN
                 ALTER TABLE EMS_Employees ADD DateOfBirth DATETIME2 NULL, Gender NVARCHAR(20) NULL, Nationality NVARCHAR(50) NULL;
             END
+
+            -- Make previously mandatory fields optional
+            ALTER TABLE EMS_Employees ALTER COLUMN LastName NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN AadhaarNumber NVARCHAR(20) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN PhoneNumber NVARCHAR(20) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN Address NVARCHAR(250) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN City NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN State NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN District NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN Pincode NVARCHAR(10) NULL;
         ";
         await dbContext.Database.ExecuteSqlRawAsync(addColumnsSql);
 
@@ -237,3 +257,4 @@ if (app.Environment.IsDevelopment())
 
 Log.Information("EMS Clean API started successfully.");
 app.Run();
+

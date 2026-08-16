@@ -42,7 +42,7 @@ namespace EMS.Application.Services
                 existing.Incentives = dto.Incentives;
                 existing.Allowances = dto.Allowances;
                 existing.AdvancePayments = dto.AdvancePayments;
-                existing.BaseSalary = employee.SalaryPerMonth;
+                existing.BaseSalary = dto.BaseSalary;
                 existing.NetPayable = existing.BaseSalary + dto.Incentives + dto.Allowances - dto.AdvancePayments;
                 existing.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
 
@@ -59,11 +59,11 @@ namespace EMS.Application.Services
                     EmployeeId = employeeId,
                     Month = month,
                     Year = year,
-                    BaseSalary = employee.SalaryPerMonth,
+                    BaseSalary = dto.BaseSalary,
                     Incentives = dto.Incentives,
                     Allowances = dto.Allowances,
                     AdvancePayments = dto.AdvancePayments,
-                    NetPayable = employee.SalaryPerMonth + dto.Incentives + dto.Allowances - dto.AdvancePayments,
+                    NetPayable = dto.BaseSalary + dto.Incentives + dto.Allowances - dto.AdvancePayments,
                     IsPaid = false,
                     CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")),
                     UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"))
@@ -191,3 +191,4 @@ namespace EMS.Application.Services
         }
     }
 }
+

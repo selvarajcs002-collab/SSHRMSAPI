@@ -66,7 +66,7 @@ namespace EMS.Infrastructure.Repositories
         public async Task<EmsEmployee> Add(EmsEmployee employee)
         {
             await _context.Database.ExecuteSqlRawAsync(
-                $"EXEC {EmsStoredProcedures.RegisterEmployeeBasic} @Id, @EmployeeCode, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber, @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup, @MaritalStatus, @SalaryPerMonth, @Referral, @IsConfirmed, @Status, @CreatedAt, @UpdatedAt, @Email, @Designation, @DepartmentName, @ProfilePicture",
+                $"EXEC {EmsStoredProcedures.RegisterEmployeeBasic} @Id, @EmployeeCode, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber, @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup, @MaritalStatus, @PerDaySalary, @Referral, @IsConfirmed, @Status, @CreatedAt, @UpdatedAt, @Email, @Designation, @DepartmentName, @ProfilePicture",
                 new SqlParameter("@Id", employee.Id),
                 new SqlParameter("@EmployeeCode", employee.EmployeeCode ?? string.Empty),
                 new SqlParameter("@FirstName", employee.FirstName),
@@ -81,7 +81,7 @@ namespace EMS.Infrastructure.Repositories
                 new SqlParameter("@PanNumber", (object?)employee.PanNumber ?? DBNull.Value),
                 new SqlParameter("@BloodGroup", (object?)employee.BloodGroup ?? DBNull.Value),
                 new SqlParameter("@MaritalStatus", (object?)employee.MaritalStatus ?? DBNull.Value),
-                new SqlParameter("@SalaryPerMonth", employee.SalaryPerMonth),
+                new SqlParameter("@PerDaySalary", employee.PerDaySalary),
                 new SqlParameter("@Referral", (object?)employee.Referral ?? DBNull.Value),
                 new SqlParameter("@IsConfirmed", employee.IsConfirmed),
                 new SqlParameter("@Status", (int)employee.Status),
@@ -98,7 +98,7 @@ namespace EMS.Infrastructure.Repositories
         public async Task<EmsEmployee> Update(EmsEmployee employee)
         {
             await _context.Database.ExecuteSqlRawAsync(
-                $"EXEC {EmsStoredProcedures.UpdateEmployee} @Id, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber, @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup, @MaritalStatus, @SalaryPerMonth, @Referral, @Status, @IsConfirmed, @EmployeeCode, @UpdatedAt, @Email, @Designation, @DepartmentName, @ProfilePicture",
+                $"EXEC {EmsStoredProcedures.UpdateEmployee} @Id, @FirstName, @LastName, @AadhaarNumber, @PhoneNumber, @Address, @City, @State, @District, @Pincode, @PanNumber, @BloodGroup, @MaritalStatus, @PerDaySalary, @Referral, @Status, @IsConfirmed, @EmployeeCode, @UpdatedAt, @Email, @Designation, @DepartmentName, @ProfilePicture",
                 new SqlParameter("@Id", employee.Id),
                 new SqlParameter("@FirstName", employee.FirstName),
                 new SqlParameter("@LastName", employee.LastName),
@@ -112,7 +112,7 @@ namespace EMS.Infrastructure.Repositories
                 new SqlParameter("@PanNumber", (object?)employee.PanNumber ?? DBNull.Value),
                 new SqlParameter("@BloodGroup", (object?)employee.BloodGroup ?? DBNull.Value),
                 new SqlParameter("@MaritalStatus", (object?)employee.MaritalStatus ?? DBNull.Value),
-                new SqlParameter("@SalaryPerMonth", employee.SalaryPerMonth),
+                new SqlParameter("@PerDaySalary", employee.PerDaySalary),
                 new SqlParameter("@Referral", (object?)employee.Referral ?? DBNull.Value),
                 new SqlParameter("@Status", (int)employee.Status),
                 new SqlParameter("@IsConfirmed", employee.IsConfirmed),

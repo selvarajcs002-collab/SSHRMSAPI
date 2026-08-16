@@ -131,22 +131,7 @@ namespace EMS.Application.Services
                 throw new InvalidOperationException("Registration is already confirmed.");
             }
 
-            // Validation: If bank details exist, the Bank Passbook/front page document is mandatory
-            if (employee.BankDetail != null)
-            {
-                var hasBankDocument = employee.Documents.Any(d => d.DocumentType == EmsDocumentType.BankPassbook);
-                if (!hasBankDocument)
-                {
-                    throw new InvalidOperationException("Bank passbook/front page document is mandatory because bank details are entered.");
-                }
-            }
 
-            // Validation: Aadhaar card is always mandatory for registration confirmation
-            var hasAadharDocument = employee.Documents.Any(d => d.DocumentType == EmsDocumentType.AadharCard);
-            if (!hasAadharDocument)
-            {
-                throw new InvalidOperationException("Aadhaar card document is mandatory to confirm registration.");
-            }
 
             // Generate employee code and confirm
             var seq = await _repository.GetNextSequenceNumber();
@@ -172,7 +157,7 @@ namespace EMS.Application.Services
                 City = e.City,
                 Status = e.Status,
                 CreatedAt = e.CreatedAt,
-                SalaryPerMonth = e.SalaryPerMonth,
+                PerDaySalary = e.PerDaySalary,
                 Email = e.Email,
                 Designation = e.Designation,
                 DepartmentName = e.DepartmentName,
