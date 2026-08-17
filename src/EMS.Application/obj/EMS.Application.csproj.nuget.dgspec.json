@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Application\\EMS.Application.csproj": {}
+    "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Application\\EMS.Application.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Application\\EMS.Application.csproj": {
+    "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Application\\EMS.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Application\\EMS.Application.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Application\\EMS.Application.csproj",
         "projectName": "EMS.Application",
-        "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Application\\EMS.Application.csproj",
+        "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Application\\EMS.Application.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Application\\obj\\",
+        "outputPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\EMS.Domain.csproj": {
-                "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\EMS.Domain.csproj"
+              "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\EMS.Domain.csproj": {
+                "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\EMS.Domain.csproj"
               }
             }
           }
@@ -56,7 +56,7 @@
           "dependencies": {
             "AutoMapper": {
               "target": "Package",
-              "version": "[13.0.1, )"
+              "version": "[16.2.0, )"
             },
             "FluentValidation.DependencyInjectionExtensions": {
               "target": "Package",
@@ -83,14 +83,14 @@
         }
       }
     },
-    "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\EMS.Domain.csproj": {
+    "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\EMS.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\EMS.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\EMS.Domain.csproj",
         "projectName": "EMS.Domain",
-        "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\EMS.Domain.csproj",
+        "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\EMS.Domain.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\obj\\",
+        "outputPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

@@ -66,7 +66,7 @@ builder.Services.AddScoped<IExcelExportService, ExcelExportService>();
 builder.Services.AddHostedService<AttendanceArchivalService>();
 
 // Register AutoMapper
-builder.Services.AddAutoMapper(typeof(EmsMappingProfile));
+builder.Services.AddAutoMapper(cfg => cfg.AddProfile<EMS.Application.Common.Mappings.EmsMappingProfile>());
 
 // CORS policy for Angular frontend (allow dynamic ports)
 builder.Services.AddCors(options =>

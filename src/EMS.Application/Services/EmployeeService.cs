@@ -30,6 +30,11 @@ namespace EMS.Application.Services
 
         public async Task<EmployeeBasicDetailDto> CreateBasicDetails(EmployeeBasicDetailCreateDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.AadhaarNumber))
+            {
+                throw new ArgumentException("Aadhaar number is required.", nameof(dto.AadhaarNumber));
+            }
+
             var existing = await _repository.GetByAadhaarNumber(dto.AadhaarNumber);
             if (existing != null)
             {

@@ -14,11 +14,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\EMS.Domain.csproj",
+      "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\EMS.Domain.csproj",
       "projectName": "EMS.Domain",
-      "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\EMS.Domain.csproj",
+      "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\EMS.Domain.csproj",
       "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ADMIN\\Desktop\\SSProjectSolution\\EMP-API\\src\\EMS.Domain\\obj\\",
+      "outputPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\src\\EMS.Domain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
