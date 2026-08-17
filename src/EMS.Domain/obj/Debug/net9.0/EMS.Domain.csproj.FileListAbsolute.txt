@@ -1,0 +1,12 @@
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\bin\Debug\net9.0\EMS.Domain.deps.json
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\bin\Debug\net9.0\EMS.Domain.dll
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\bin\Debug\net9.0\EMS.Domain.pdb
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\EMS.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\EMS.Domain.AssemblyInfoInputs.cache
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\EMS.Domain.AssemblyInfo.cs
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\EMS.Domain.csproj.CoreCompileInputs.cache
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\EMS.Domain.sourcelink.json
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\EMS.Domain.dll
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\refint\EMS.Domain.dll
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\EMS.Domain.pdb
+C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\src\EMS.Domain\obj\Debug\net9.0\ref\EMS.Domain.dll

@@ -1,0 +1,47 @@
+2026-08-17 21:29:24.569 +05:30 [ERR] Failed executing DbCommand (419ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [EMS_Departments] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [Description] nvarchar(250) NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_EMS_Departments] PRIMARY KEY ([Id])
+);
+2026-08-17 21:29:24.971 +05:30 [WRN] Tables might already exist. There is already an object named 'EMS_Departments' in the database.
+2026-08-17 21:29:25.454 +05:30 [INF] Executed DbCommand (294ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+
+            IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'DateOfBirth' AND Object_ID = Object_ID(N'EMS_Employees'))
+            BEGIN
+                ALTER TABLE EMS_Employees ADD DateOfBirth DATETIME2 NULL, Gender NVARCHAR(20) NULL, Nationality NVARCHAR(50) NULL;
+            END
+
+            -- Make previously mandatory fields optional
+            ALTER TABLE EMS_Employees ALTER COLUMN LastName NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN AadhaarNumber NVARCHAR(20) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN PhoneNumber NVARCHAR(20) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN Address NVARCHAR(250) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN City NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN State NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN District NVARCHAR(100) NULL;
+            ALTER TABLE EMS_Employees ALTER COLUMN Pincode NVARCHAR(10) NULL;
+2026-08-17 21:29:25.549 +05:30 [INF] Database successfully ensured.
+2026-08-17 21:29:25.561 +05:30 [WRN] Could not find db_scripts.sql at path: C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API\..\..\db_scripts.sql. Stored procedures may not be initialized.
+2026-08-17 21:29:25.731 +05:30 [INF] EMS Clean API started successfully.
+2026-08-17 21:29:25.769 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-08-17 21:29:25.793 +05:30 [INF] PayrollArchivalService started.
+2026-08-17 21:29:30.877 +05:30 [INF] Attendance Archival Service is starting.
+2026-08-17 21:29:31.089 +05:30 [INF] Now listening on: http://localhost:5263
+2026-08-17 21:29:31.091 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-08-17 21:29:31.092 +05:30 [INF] Hosting environment: Development
+2026-08-17 21:29:31.094 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SSProjectSolution\EMP-API
+2026-08-17 21:29:31.137 +05:30 [INF] Executed DbCommand (306ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-17 21:29:31.401 +05:30 [INF] Executed DbCommand (230ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-17 21:29:31.485 +05:30 [INF] Next archival check scheduled in 2.5079425930555557 hours.
+2026-08-17 21:36:45.228 +05:30 [INF] Application is shutting down...
