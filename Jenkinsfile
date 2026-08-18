@@ -163,7 +163,7 @@ stage('Build & Publish') {
 
                     if [ -d "$DEPLOY_PATH" ] && [ "$(ls -A "$DEPLOY_PATH" 2>/dev/null)" ]; then
                         mkdir -p "$BACKUP_DIR"
-                        cp -a "$DEPLOY_PATH"/. "$BACKUP_DIR"/
+                        cp -r "$DEPLOY_PATH"/. "$BACKUP_DIR"/
                         echo "$BACKUP_DIR" > "${BACKUP_ROOT}/.last_api_backup"
                         echo "Backup completed."
                     fi
@@ -197,7 +197,7 @@ stage('Build & Publish') {
                     rm -rf "$DEPLOY_PATH"/*
 
                     # Copy published binaries
-                    cp -a "$PUBLISH_PATH"/. "$DEPLOY_PATH"/
+                    cp -r "$PUBLISH_PATH"/. "$DEPLOY_PATH"/
 
                     # Set ownership for www-data
                     chown -R www-data:www-data "$DEPLOY_PATH"
@@ -271,7 +271,7 @@ Path        : ${DEPLOY_PATH}
                         echo "Restoring from $RESTORE_PATH..."
                         sudo -n /usr/bin/systemctl stop "$SERVICE_NAME" || true
                         rm -rf "$DEPLOY_PATH"/*
-                        cp -a "$RESTORE_PATH"/. "$DEPLOY_PATH"/
+                        cp -r "$RESTORE_PATH"/. "$DEPLOY_PATH"/
                         chown -R www-data:www-data "$DEPLOY_PATH"
                         sudo -n /usr/bin/systemctl start "$SERVICE_NAME" || true
                     fi
