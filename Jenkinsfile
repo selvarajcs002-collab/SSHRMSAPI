@@ -187,29 +187,64 @@ stage('Build & Publish') {
         // ============================================================
         // 7. DEPLOY
         // ============================================================
-        stage('Deploy') {
-            steps {
-                sh '''#!/bin/bash
-                    set -e
-                    echo "Deploying new binaries..."
+        // ============================================================
+// 7. DEPLOY
+// ============================================================
+stage('Deploy') {
+    steps {
+        sh '''#!/bin/bash
+            set -e
 
-                    # Clean existing deployment files
-                    rm -rf "$DEPLOY_PATH"/*
+            echo "=========================================="
+            echo " DEPLOYING HRMS DEV API"
+            echo "=========================================="
 
-                    # Copy published binaries
-                    cp -r "$PUBLISH_PATH"/. "$DEPLOY_PATH"/
+            echo "Deploy Path  : $DEPLOY_PATH"
+            echo "Publish Path : $PUBLISH_PATH"
 
-                    # Set ownership for www-data
-                    chown -R www-data:www-data "$DEPLOY_PATH"
-                    chmod -R 755 "$DEPLOY_PATH"
+            # Make sure deployment directory exists
+            sudo -n mkdir -p "$DEPLOY_PATH"
 
-                    if [ ! -f "$DEPLOY_PATH/$APP_DLL" ]; then
-                        echo "ERROR: $APP_DLL missing after copy."
-                        exit 1
-                    fi
-                '''
-            }
-        }
+            echo "Cleaning existing deployment files..."
+
+            sudo -n rm -rf "$DEPLOY_PATH"/*
+
+            echo "Deploying new binaries..."
+
+            # IMPORTANT:
+            # Do not use cp -a or cp -r here.
+            # rsync avoids the directory timestamp preservation issue.
+            sudo -n rsync -r \
+                --delete \
+                --omit-dir-times \
+                "$PUBLISH_PATH"/ \
+                "$DEPLOY_PATH"/
+
+            echo "Setting ownership..."
+
+            sudo -n chown -R www-data:www-data "$DEPLOY_PATH"
+
+            echo "Setting permissions..."
+
+            sudo -n find "$DEPLOY_PATH" -type d -exec chmod 755 {} \\;
+            sudo -n find "$DEPLOY_PATH" -type f -exec chmod 644 {} \\;
+
+            echo "Verifying deployed application..."
+
+            if [ ! -f "$DEPLOY_PATH/$APP_DLL" ]; then
+                echo "ERROR: $APP_DLL missing after deployment."
+                echo "Deployment directory contents:"
+                sudo -n ls -la "$DEPLOY_PATH"
+                exit 1
+            fi
+
+            echo "Deployment files:"
+            sudo -n ls -lah "$DEPLOY_PATH"
+
+            echo "Deployment completed successfully."
+        '''
+    }
+}
 
         // ============================================================
         // 8. START & VERIFY SERVICE
@@ -261,24 +296,57 @@ Path        : ${DEPLOY_PATH}
         }
 
         failure {
-            echo "Deployment failed. Rolling back..."
-            sh '''#!/bin/bash
-                set +e
-                BACKUP_POINTER="${BACKUP_ROOT}/.last_api_backup"
-                if [ -f "$BACKUP_POINTER" ]; then
-                    RESTORE_PATH=$(cat "$BACKUP_POINTER")
-                    if [ -d "$RESTORE_PATH" ]; then
-                        echo "Restoring from $RESTORE_PATH..."
-                        sudo -n /usr/bin/systemctl stop "$SERVICE_NAME" || true
-                        rm -rf "$DEPLOY_PATH"/*
-                        cp -r "$RESTORE_PATH"/. "$DEPLOY_PATH"/
-                        chown -R www-data:www-data "$DEPLOY_PATH"
-                        sudo -n /usr/bin/systemctl start "$SERVICE_NAME" || true
-                    fi
-                fi
-            '''
-        }
+    echo "Deployment failed. Rolling back..."
 
+    sh '''#!/bin/bash
+        set +e
+
+        BACKUP_POINTER="${BACKUP_ROOT}/.last_api_backup"
+
+        if [ -f "$BACKUP_POINTER" ]; then
+
+            RESTORE_PATH=$(cat "$BACKUP_POINTER")
+
+            if [ -d "$RESTORE_PATH" ]; then
+
+                echo "=========================================="
+                echo " ROLLING BACK"
+                echo "=========================================="
+
+                echo "Restore Path: $RESTORE_PATH"
+
+                sudo -n /usr/bin/systemctl stop "$SERVICE_NAME" || true
+
+                sudo -n mkdir -p "$DEPLOY_PATH"
+
+                sudo -n rm -rf "$DEPLOY_PATH"/*
+
+                sudo -n rsync -r \
+                    --delete \
+                    --omit-dir-times \
+                    "$RESTORE_PATH"/ \
+                    "$DEPLOY_PATH"/
+
+                sudo -n chown -R www-data:www-data "$DEPLOY_PATH"
+
+                sudo -n find "$DEPLOY_PATH" -type d -exec chmod 755 {} \\;
+                sudo -n find "$DEPLOY_PATH" -type f -exec chmod 644 {} \\;
+
+                sudo -n /usr/bin/systemctl start "$SERVICE_NAME" || true
+
+                echo "Rollback completed."
+
+            else
+                echo "Backup directory does not exist:"
+                echo "$RESTORE_PATH"
+            fi
+
+        else
+            echo "No backup pointer found."
+            echo "Rollback cannot be performed."
+        fi
+    '''
+}
         always {
             cleanWs(deleteDirs: true, disableDeferredWipeout: true, notFailBuild: true)
         }
