@@ -77,52 +77,79 @@ pipeline {
         // ============================================================
         // 3. CLEAN & RESTORE
         // ============================================================
-        stage('Restore') {
-            steps {
-                sh '''#!/bin/bash
-                    set -e
-                    rm -rf "$PUBLISH_PATH"
-                    mkdir -p "$PUBLISH_PATH"
-                    dotnet clean -c Release --nologo
-                    dotnet restore
-                '''
-            }
-        }
+       stage('Restore') {
+    steps {
+        sh '''#!/bin/bash
+            set -e
 
-        // ============================================================
-        // 4. BUILD & PUBLISH
-        // ============================================================
-        stage('Build & Publish') {
-            steps {
-                sh '''#!/bin/bash
-                    set -e
-                    echo "Building and Publishing $MAIN_PROJECT..."
+            echo "=========================================="
+            echo " CLEAN & RESTORE"
+            echo "=========================================="
 
-                    if [ -f "$MAIN_PROJECT" ]; then
-                        BUILD_TARGET="$MAIN_PROJECT"
-                    else
-                        BUILD_TARGET=$(find . -name "EMS.API.csproj" | head -n 1)
-                    fi
+            echo "Removing generated build artifacts..."
 
-                    dotnet publish "$BUILD_TARGET" \
-                        -c Release \
-                        -o "$PUBLISH_PATH" \
-                        --nologo
+            rm -rf bin
+            rm -rf obj
+            rm -rf "$PUBLISH_PATH"
 
-                    if [ ! -f "$PUBLISH_PATH/$APP_DLL" ]; then
-                        echo "ERROR: $APP_DLL was not generated in $PUBLISH_PATH"
-                        ls -la "$PUBLISH_PATH"
-                        exit 1
-                    fi
+            mkdir -p "$PUBLISH_PATH"
 
-                    # Remove static web asset manifests to prevent Linux path errors
-                    rm -f "$PUBLISH_PATH"/*.staticwebassets.runtime.json
-                    mkdir -p "$PUBLISH_PATH/wwwroot"
+            echo "Restoring NuGet packages..."
 
-                    echo "Publish verified successfully."
-                '''
-            }
-        }
+            dotnet restore "$MAIN_PROJECT" \
+                --configfile nuget.config \
+                --nologo
+
+            echo "Restore completed successfully."
+        '''
+    }
+}
+
+stage('Build & Publish') {
+    steps {
+        sh '''#!/bin/bash
+            set -e
+
+            echo "=========================================="
+            echo " BUILD & PUBLISH"
+            echo "=========================================="
+
+            echo "Building and Publishing $MAIN_PROJECT..."
+
+            if [ -f "$MAIN_PROJECT" ]; then
+                BUILD_TARGET="$MAIN_PROJECT"
+            else
+                BUILD_TARGET=$(find . -name "EMS.API.csproj" | head -n 1)
+            fi
+
+            if [ -z "$BUILD_TARGET" ]; then
+                echo "ERROR: EMS.API.csproj not found."
+                exit 1
+            fi
+
+            echo "Build Target: $BUILD_TARGET"
+
+            dotnet publish "$BUILD_TARGET" \
+                -c Release \
+                -o "$PUBLISH_PATH" \
+                --no-restore \
+                --nologo
+
+            if [ ! -f "$PUBLISH_PATH/$APP_DLL" ]; then
+                echo "ERROR: $APP_DLL was not generated."
+                echo "Contents of publish directory:"
+                ls -la "$PUBLISH_PATH"
+                exit 1
+            fi
+
+            rm -f "$PUBLISH_PATH"/*.staticwebassets.runtime.json
+
+            mkdir -p "$PUBLISH_PATH/wwwroot"
+
+            echo "Publish verified successfully."
+        '''
+    }
+}
 
         // ============================================================
         // 5. BACKUP
