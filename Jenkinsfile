@@ -154,23 +154,39 @@ stage('Build & Publish') {
         // ============================================================
         // 5. BACKUP
         // ============================================================
-        stage('Backup') {
-            steps {
-                sh '''#!/bin/bash
-                    set -e
-                    BACKUP_DIR="${BACKUP_ROOT}/API_Backup_$(date +%Y%m%d_%H%M%S)"
-                    echo "Creating backup at: $BACKUP_DIR"
+        // ============================================================
+// 5. BACKUP
+// ============================================================
+stage('Backup') {
+    steps {
+        sh '''#!/bin/bash
+            set -e
 
-                    if [ -d "$DEPLOY_PATH" ] && [ "$(ls -A "$DEPLOY_PATH" 2>/dev/null)" ]; then
-                        mkdir -p "$BACKUP_DIR"
-                        cp -r "$DEPLOY_PATH"/. "$BACKUP_DIR"/
-                        echo "$BACKUP_DIR" > "${BACKUP_ROOT}/.last_api_backup"
-                        echo "Backup completed."
-                    fi
-                '''
-            }
-        }
+            BACKUP_DIR="${BACKUP_ROOT}/API_Backup_$(date +%Y%m%d_%H%M%S)"
 
+            echo "Creating backup at:"
+            echo "$BACKUP_DIR"
+
+            if [ -d "$DEPLOY_PATH" ] && [ "$(sudo -n ls -A "$DEPLOY_PATH" 2>/dev/null)" ]; then
+
+                sudo -n mkdir -p "$BACKUP_DIR"
+
+                sudo -n rsync -r \
+                    --omit-dir-times \
+                    "$DEPLOY_PATH"/ \
+                    "$BACKUP_DIR"/
+
+                echo "$BACKUP_DIR" | sudo -n tee "${BACKUP_ROOT}/.last_api_backup" > /dev/null
+
+                echo "Backup completed successfully."
+
+            else
+                echo "No existing deployment found."
+                echo "Skipping backup."
+            fi
+        '''
+    }
+}
         // ============================================================
         // 6. STOP SERVICE
         // ============================================================
