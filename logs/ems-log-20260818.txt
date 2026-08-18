@@ -1,0 +1,41 @@
+2026-08-18 00:00:00.151 +05:30 [INF] Executed DbCommand (106ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-18 00:00:00.224 +05:30 [INF] Executed DbCommand (63ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-18 00:00:00.226 +05:30 [INF] Next archival check scheduled in 23.999937037694444 hours.
+2026-08-18 21:11:12.649 +05:30 [ERR] Failed executing DbCommand (287ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [EMS_Departments] (
+    [Id] uniqueidentifier NOT NULL,
+    [Name] nvarchar(100) NOT NULL,
+    [Description] nvarchar(250) NULL,
+    [CreatedAt] datetime2 NOT NULL,
+    CONSTRAINT [PK_EMS_Departments] PRIMARY KEY ([Id])
+);
+2026-08-18 21:11:12.765 +05:30 [WRN] Tables might already exist. There is already an object named 'EMS_Departments' in the database.
+2026-08-18 21:11:13.104 +05:30 [INF] Database successfully ensured.
+2026-08-18 21:11:13.111 +05:30 [WRN] Could not find db_scripts.sql at path: C:\Users\ADMIN\Desktop\SSEMB-API\SSHRMSAPI\..\..\db_scripts.sql. Stored procedures may not be initialized.
+2026-08-18 21:11:13.133 +05:30 [INF] EMS Clean API started successfully.
+2026-08-18 21:11:13.180 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-08-18 21:11:13.203 +05:30 [INF] PayrollArchivalService started.
+2026-08-18 21:11:15.708 +05:30 [INF] Attendance Archival Service is starting.
+2026-08-18 21:11:15.951 +05:30 [INF] Executed DbCommand (309ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-18 21:11:16.150 +05:30 [INF] Now listening on: http://localhost:5263
+2026-08-18 21:11:16.153 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-08-18 21:11:16.156 +05:30 [INF] Hosting environment: Development
+2026-08-18 21:11:16.159 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SSEMB-API\SSHRMSAPI
+2026-08-18 21:11:16.731 +05:30 [INF] Executed DbCommand (721ms) [Parameters=[@__month_0='?' (DbType = Int32), @__year_1='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [e].[Id], [e].[AdvancePayments], [e].[Allowances], [e].[BaseSalary], [e].[CreatedAt], [e].[EmployeeId], [e].[Incentives], [e].[IsPaid], [e].[Month], [e].[NetPayable], [e].[PaidDate], [e].[PayslipFilePath], [e].[UpdatedAt], [e].[Year], [e0].[Id], [e0].[AadhaarNumber], [e0].[Address], [e0].[BloodGroup], [e0].[City], [e0].[CreatedAt], [e0].[DateOfBirth], [e0].[DepartmentName], [e0].[Designation], [e0].[District], [e0].[Email], [e0].[EmployeeCode], [e0].[FirstName], [e0].[Gender], [e0].[IsConfirmed], [e0].[LastName], [e0].[MaritalStatus], [e0].[Nationality], [e0].[PanNumber], [e0].[PerDaySalary], [e0].[PhoneNumber], [e0].[Pincode], [e0].[ProfilePicture], [e0].[Referral], [e0].[State], [e0].[Status], [e0].[UpdatedAt]
+FROM [EMS_Payrolls] AS [e]
+INNER JOIN [EMS_Employees] AS [e0] ON [e].[EmployeeId] = [e0].[Id]
+WHERE [e].[Month] = @__month_0 AND [e].[Year] = @__year_1
+2026-08-18 21:11:16.750 +05:30 [INF] Next archival check scheduled in 2.8120166716666666 hours.

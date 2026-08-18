@@ -27,7 +27,7 @@ pipeline {
         DOTNET_ENVIRONMENT = "Production"
         API_PORT           = "6000"
         BACKUP_ROOT        = "/var/www/HRMS/DEV"
-        MAIN_PROJECT       = "src/EMS.API/EMS.API.csproj"
+        MAIN_PROJECT       = "EMS.API.csproj"
         APP_DLL            = "EMS.API.dll"
     }
 
