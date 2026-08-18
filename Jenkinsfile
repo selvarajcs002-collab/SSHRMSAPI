@@ -190,42 +190,51 @@ pipeline {
         // 7. START & VERIFY
         // =========================================================
         stage('Start & Verify') {
-            steps {
-                sh '''
-                    set -e
+    steps {
+        sh '''
+            set -e
 
-                    echo "Starting $SERVICE_NAME..."
+            echo "Starting $SERVICE_NAME..."
 
-                    sudo -n systemctl daemon-reload
+            sudo -n systemctl daemon-reload
+            sudo -n systemctl start "$SERVICE_NAME"
 
-                    sudo -n systemctl start "$SERVICE_NAME"
+            echo "Checking service status..."
 
-                    echo "Waiting for API port $API_PORT..."
+            sleep 3
 
-                    for i in {1..15}; do
+            if ! sudo -n systemctl is-active --quiet "$SERVICE_NAME"; then
+                echo "ERROR: Service is not running."
 
-                        if ss -lnt | grep -q ":${API_PORT} "; then
+                sudo -n systemctl status "$SERVICE_NAME" --no-pager
+                sudo -n journalctl -u "$SERVICE_NAME" -n 50 --no-pager
 
-                            echo "API is running."
-                            echo "Port $API_PORT is listening."
+                exit 1
+            fi
 
-                            exit 0
-                        fi
+            echo "Service is running successfully."
 
-                        sleep 2
-                    done
+            echo "Checking API port $API_PORT..."
 
-                    echo "ERROR: API did not start."
+            for i in {1..15}; do
 
-                    sudo -n journalctl \
-                        -u "$SERVICE_NAME" \
-                        -n 50 \
-                        --no-pager
+                if ss -lnt | grep -q ":${API_PORT}"; then
+                    echo "API is listening on port $API_PORT."
+                    exit 0
+                fi
 
-                    exit 1
-                '''
-            }
-        }
+                sleep 2
+            done
+
+            echo "ERROR: Service is running but port $API_PORT was not detected."
+
+            sudo -n systemctl status "$SERVICE_NAME" --no-pager
+            sudo -n journalctl -u "$SERVICE_NAME" -n 50 --no-pager
+
+            exit 1
+        '''
+    }
+}
     }
 
 
