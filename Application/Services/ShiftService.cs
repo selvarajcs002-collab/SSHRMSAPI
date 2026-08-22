@@ -46,7 +46,7 @@ namespace EMS.Application.Services
 
             var shift = _mapper.Map<EmsShift>(dto);
             shift.Id = Guid.NewGuid();
-            shift.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            shift.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")));
 
             var created = await _repository.Add(shift);
             created.Employee = employee; // populate navigation for mapping

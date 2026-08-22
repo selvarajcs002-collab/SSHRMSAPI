@@ -41,7 +41,7 @@ namespace EMS.Application.Services
             {
                 existing.Status = dto.Status;
                 existing.Remarks = dto.Remarks;
-                existing.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                existing.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")));
                 var updated = await _repository.Update(existing);
                 updated.Employee = employee;
                 return _mapper.Map<AttendanceDto>(updated);
@@ -50,8 +50,8 @@ namespace EMS.Application.Services
             {
                 var attendance = _mapper.Map<EmsAttendance>(dto);
                 attendance.Id = Guid.NewGuid();
-                attendance.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
-                attendance.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                attendance.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")));
+                attendance.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")));
 
                 var created = await _repository.Add(attendance);
                 created.Employee = employee;
@@ -112,8 +112,8 @@ namespace EMS.Application.Services
                         Date = date,
                         Status = EmsAttendanceStatus.Absent, // default to absent if not marked
                         Remarks = "Not marked (auto-absent)",
-                        CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")),
-                        UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"))
+                        CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata"))),
+                        UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")))
                     });
                 }
             }
@@ -165,7 +165,7 @@ namespace EMS.Application.Services
 
             attendance.Status = dto.Status;
             attendance.Remarks = dto.Remarks;
-            attendance.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            attendance.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")));
 
             var updated = await _repository.Update(attendance);
             var employee = await _employeeRepository.GetById(updated.EmployeeId);

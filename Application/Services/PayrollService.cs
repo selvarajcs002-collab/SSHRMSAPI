@@ -46,7 +46,7 @@ namespace EMS.Application.Services
                 existing.AdvancePayments = dto.AdvancePayments;
                 existing.BaseSalary = baseSalary;
                 existing.NetPayable = existing.BaseSalary + dto.Incentives + dto.Allowances - dto.AdvancePayments;
-                existing.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+                existing.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")));
 
                 var updated = await _repository.Update(existing);
                 updated.Employee = employee;
@@ -67,8 +67,8 @@ namespace EMS.Application.Services
                     AdvancePayments = dto.AdvancePayments,
                     NetPayable = baseSalary + dto.Incentives + dto.Allowances - dto.AdvancePayments,
                     IsPaid = false,
-                    CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")),
-                    UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"))
+                    CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata"))),
+                    UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")))
                 };
 
                 var created = await _repository.Add(payroll);
@@ -96,7 +96,7 @@ namespace EMS.Application.Services
             var list = new List<EmsPayroll>();
             for (int m = 1; m <= 12; m++)
             {
-                var payroll = await _repository.GetByEmployeeAndPeriod(employeeId, m, TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time")).Year);
+                var payroll = await _repository.GetByEmployeeAndPeriod(employeeId, m, TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata"))).Year);
                 if (payroll != null)
                 {
                     payroll.Employee = employee;
@@ -143,7 +143,7 @@ namespace EMS.Application.Services
             }
 
             payroll.IsPaid = true;
-            payroll.PaidDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("India Standard Time"));
+            payroll.PaidDate = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) ? TimeZoneInfo.FindSystemTimeZoneById("India Standard Time") : TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata")));
 
             var updated = await _repository.Update(payroll);
             var employee = await _employeeRepository.GetById(updated.EmployeeId);
