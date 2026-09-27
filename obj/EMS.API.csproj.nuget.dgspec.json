@@ -1,31 +1,27 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj": {}
+    "C:\\Users\\ADMIN\\Desktop\\SS_Project\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj": {
+    "C:\\Users\\ADMIN\\Desktop\\SS_Project\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Desktop\\SS_Project\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj",
         "projectName": "EMS.API",
-        "projectPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj",
+        "projectPath": "C:\\Users\\ADMIN\\Desktop\\SS_Project\\SSEMB-API\\SSHRMSAPI\\EMS.API.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\obj\\",
+        "outputPath": "C:\\Users\\ADMIN\\Desktop\\SS_Project\\SSEMB-API\\SSHRMSAPI\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\Desktop\\SSEMB-API\\SSHRMSAPI\\NuGet.Config",
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\ADMIN\\Desktop\\SS_Project\\SSEMB-API\\SSHRMSAPI\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
         ],
         "sources": {
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -50,17 +46,9 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "AutoMapper": {
+            "Dapper": {
               "target": "Package",
-              "version": "[13.0.1, )"
-            },
-            "ClosedXML": {
-              "target": "Package",
-              "version": "[0.105.0, )"
-            },
-            "FluentValidation.DependencyInjectionExtensions": {
-              "target": "Package",
-              "version": "[12.1.1, )"
+              "version": "[2.1.35, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
@@ -70,19 +58,17 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
-            "Microsoft.EntityFrameworkCore.Design": {
-              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-              "suppressParent": "All",
+            "Microsoft.Data.SqlClient": {
               "target": "Package",
-              "version": "[8.0.0, )"
-            },
-            "Microsoft.EntityFrameworkCore.SqlServer": {
-              "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[5.2.0, )"
             },
             "Microsoft.Extensions.Configuration.Abstractions": {
               "target": "Package",
               "version": "[9.0.0, )"
+            },
+            "QuestPDF": {
+              "target": "Package",
+              "version": "[2025.7.1, )"
             },
             "Serilog.AspNetCore": {
               "target": "Package",
@@ -104,6 +90,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.31, 8.0.31]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -112,7 +116,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.306/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.318/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

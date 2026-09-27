@@ -1,0 +1,76 @@
+2026-09-22 08:40:29.981 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-09-22 08:40:31.843 +05:30 [INF] Now listening on: http://localhost:6000
+2026-09-22 08:40:31.846 +05:30 [INF] Now listening on: http://0.0.0.0:6000
+2026-09-22 08:40:31.853 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-09-22 08:40:31.856 +05:30 [INF] Hosting environment: Development
+2026-09-22 08:40:31.860 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SS_Project\SSEMB-API\SSHRMSAPI
+2026-09-22 08:56:39.322 +05:30 [INF] Request starting HTTP/1.1 HEAD http://localhost:6000/swagger/index.html - null null
+2026-09-22 08:56:39.922 +05:30 [INF] Request finished HTTP/1.1 HEAD http://localhost:6000/swagger/index.html - 404 null null 637.1982ms
+2026-09-22 08:56:39.952 +05:30 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: HEAD http://localhost:6000/swagger/index.html, Response status code: 404
+2026-09-22 08:57:39.050 +05:30 [INF] Request starting HTTP/1.1 HEAD http://localhost:6000/swagger/v1/swagger.json - null null
+2026-09-22 08:57:39.089 +05:30 [INF] Request finished HTTP/1.1 HEAD http://localhost:6000/swagger/v1/swagger.json - 404 null null 38.1508ms
+2026-09-22 08:57:39.099 +05:30 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: HEAD http://localhost:6000/swagger/v1/swagger.json, Response status code: 404
+2026-09-22 08:59:54.144 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6000/swagger/v1/swagger.json - null null
+2026-09-22 08:59:55.028 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6000/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 883.83ms
+2026-09-22 09:00:19.640 +05:30 [INF] Request starting HTTP/1.1 HEAD http://localhost:6000/swagger - null null
+2026-09-22 09:00:19.661 +05:30 [INF] Request finished HTTP/1.1 HEAD http://localhost:6000/swagger - 404 null null 20.7452ms
+2026-09-22 09:00:19.682 +05:30 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: HEAD http://localhost:6000/swagger, Response status code: 404
+2026-09-22 09:00:37.180 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6000/swagger/index.html - null null
+2026-09-22 09:00:37.845 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6000/swagger/index.html - 200 null text/html;charset=utf-8 664.6404ms
+2026-09-22 09:00:55.602 +05:30 [INF] Application is shutting down...
+2026-09-22 09:01:16.257 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-09-22 09:01:16.659 +05:30 [INF] Now listening on: http://localhost:6000
+2026-09-22 09:01:16.661 +05:30 [INF] Now listening on: http://0.0.0.0:6000
+2026-09-22 09:01:16.664 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-09-22 09:01:16.666 +05:30 [INF] Hosting environment: Development
+2026-09-22 09:01:16.667 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SS_Project\SSEMB-API\SSHRMSAPI
+2026-09-22 09:03:24.535 +05:30 [INF] Application is shutting down...
+2026-09-22 09:03:36.236 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-09-22 09:03:36.393 +05:30 [INF] Now listening on: http://localhost:6002
+2026-09-22 09:03:36.396 +05:30 [INF] Now listening on: http://0.0.0.0:6002
+2026-09-22 09:03:36.399 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-09-22 09:03:36.401 +05:30 [INF] Hosting environment: Development
+2026-09-22 09:03:36.403 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SS_Project\SSEMB-API\SSHRMSAPI
+2026-09-22 09:03:57.501 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/index.html - null null
+2026-09-22 09:03:57.630 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/index.html - 200 null text/html;charset=utf-8 136.237ms
+2026-09-22 09:03:57.655 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/swagger-ui-bundle.js - null null
+2026-09-22 09:03:57.655 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/swagger-ui-standalone-preset.js - null null
+2026-09-22 09:03:57.657 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/swagger-ui.css - null null
+2026-09-22 09:03:57.746 +05:30 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2026-09-22 09:03:57.746 +05:30 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2026-09-22 09:03:57.758 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/swagger-ui-standalone-preset.js - 200 230280 text/javascript 102.6236ms
+2026-09-22 09:03:57.758 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/swagger-ui.css - 200 152034 text/css 100.7246ms
+2026-09-22 09:03:57.782 +05:30 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2026-09-22 09:03:57.787 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/swagger-ui-bundle.js - 200 1456926 text/javascript 131.7921ms
+2026-09-22 09:03:59.364 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/v1/swagger.json - null null
+2026-09-22 09:03:59.440 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/favicon-32x32.png - null null
+2026-09-22 09:03:59.446 +05:30 [INF] Sending file. Request path: '/favicon-32x32.png'. Physical path: 'N/A'
+2026-09-22 09:03:59.449 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/favicon-32x32.png - 200 628 image/png 8.6169ms
+2026-09-22 09:03:59.723 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 359.1118ms
+2026-09-22 22:38:49.969 +05:30 [INF] User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-09-22 22:38:50.765 +05:30 [INF] Now listening on: http://localhost:6002
+2026-09-22 22:38:50.766 +05:30 [INF] Now listening on: http://0.0.0.0:6002
+2026-09-22 22:38:50.768 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-09-22 22:38:50.769 +05:30 [INF] Hosting environment: Development
+2026-09-22 22:38:50.771 +05:30 [INF] Content root path: C:\Users\ADMIN\Desktop\SS_Project\SSEMB-API\SSHRMSAPI
+2026-09-22 22:48:21.869 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/index.html - null null
+2026-09-22 22:48:22.248 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/index.html - 200 null text/html;charset=utf-8 384.3841ms
+2026-09-22 22:48:22.781 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/swagger/v1/swagger.json - null null
+2026-09-22 22:48:23.390 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 608.5ms
+2026-09-22 22:48:37.187 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:6002/api/Employee - null null
+2026-09-22 22:48:37.301 +05:30 [INF] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+2026-09-22 22:48:37.310 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-09-22 22:48:37.312 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:6002/api/Employee - 401 0 null 124.9973ms
+2026-09-22 22:53:55.270 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:6002/api/Employee - application/json 148
+2026-09-22 22:53:55.281 +05:30 [INF] CORS policy execution failed.
+2026-09-22 22:53:55.282 +05:30 [INF] Request origin http://localhost:6002 does not have permission to access the resource.
+2026-09-22 22:53:55.287 +05:30 [INF] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+2026-09-22 22:53:55.290 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-09-22 22:53:55.294 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:6002/api/Employee - 401 0 null 24.1734ms
+2026-09-22 22:56:47.512 +05:30 [INF] Request starting HTTP/1.1 POST http://localhost:6002/api/Employee - application/json 135
+2026-09-22 22:56:47.519 +05:30 [INF] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+2026-09-22 22:56:47.520 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-09-22 22:56:47.521 +05:30 [INF] Request finished HTTP/1.1 POST http://localhost:6002/api/Employee - 401 0 null 8.8459ms

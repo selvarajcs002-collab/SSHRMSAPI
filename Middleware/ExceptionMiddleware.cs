@@ -1,73 +1,49 @@
-using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
-using EMS.Application.DTOs;
-using Microsoft.AspNetCore.Http;
-using Serilog;
+using EMS.API.Common;
 
-namespace EMS.API.Middleware
+namespace EMS.API.Middleware;
+
+public class ExceptionMiddleware
 {
-    public class ExceptionMiddleware
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionMiddleware> _logger;
+
+    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
-        private readonly RequestDelegate _next;
+        _next = next;
+        _logger = logger;
+    }
 
-        public ExceptionMiddleware(RequestDelegate next)
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
         {
-            _next = next;
+            await _next(context);
         }
-
-        public async Task InvokeAsync(HttpContext httpContext)
+        catch (Exception ex)
         {
-            try
-            {
-                await _next(httpContext);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Global Exception Handler caught: {Message}", ex.Message);
-                await HandleExceptionAsync(httpContext, ex);
-            }
+            _logger.LogError(ex, "An unexpected error occurred: {Message}", ex.Message);
+            await HandleExceptionAsync(context, ex);
         }
+    }
 
-        private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var (statusCode, message) = exception switch
         {
-            context.Response.ContentType = "application/json";
+            ArgumentException argument => (HttpStatusCode.BadRequest, argument.Message),
+            KeyNotFoundException notFound => (HttpStatusCode.NotFound, notFound.Message),
+            InvalidOperationException conflict => (HttpStatusCode.Conflict, conflict.Message),
+            _ => (HttpStatusCode.InternalServerError, "An internal server error occurred. Please try again later.")
+        };
 
-            var statusCode = HttpStatusCode.InternalServerError;
-            var message = exception.Message;
-            object? details = null;
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = (int)statusCode;
 
-            // Map standard C# exceptions to appropriate status codes
-            if (exception is KeyNotFoundException)
-            {
-                statusCode = HttpStatusCode.NotFound;
-            }
-            else if (exception is InvalidOperationException || exception is ArgumentException)
-            {
-                statusCode = HttpStatusCode.BadRequest;
-            }
-            else
-            {
-                details = exception.StackTrace;
-            }
+        var response = ApiResponse<object>.Error(message);
 
-            context.Response.StatusCode = (int)statusCode;
-
-            var response = new ErrorResponse
-            {
-                Status = "Error",
-                Message = message,
-                Details = details
-            };
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
-        }
+        var json = JsonSerializer.Serialize(response, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        return context.Response.WriteAsync(json);
     }
 }

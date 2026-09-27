@@ -1,14 +1,14 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using EMS.Application.DTOs;
-using EMS.Application.Interfaces;
+using EMS.API.DTOs;
+using EMS.API.Services;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace EMS.API.Controllers
 {
     [ApiController]
-    [Route("api/ems/attendance")]
+    [Route("api/[controller]")]
     public class AttendanceController : ControllerBase
     {
         private readonly IAttendanceService _attendanceService;
@@ -18,72 +18,146 @@ namespace EMS.API.Controllers
             _attendanceService = attendanceService;
         }
 
-        [HttpPost("mark")]
-        public async Task<IActionResult> MarkAttendance([FromBody] AttendanceMarkDto dto)
+        [HttpGet]
+        public async Task<IActionResult> GetAttendance(
+            [FromQuery] DateTime? attendanceDate,
+            [FromQuery] string? shift,
+            [FromQuery] int? employeeId)
         {
-            var result = await _attendanceService.MarkAttendance(dto);
-            return Ok(new ApiResponse<AttendanceDto>(result, "Attendance marked successfully."));
+            try
+            {
+                var result = await _attendanceService.GetAttendanceAsync(attendanceDate, shift, employeeId);
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while retrieving attendance.", error = ex.Message });
+            }
         }
 
-        [HttpPost("mark-bulk")]
-        public async Task<IActionResult> MarkBulkAttendance([FromBody] AttendanceBulkMarkDto dto)
+        [HttpPost]
+        public async Task<IActionResult> SaveAttendance([FromBody] BulkAttendanceRequest request)
         {
-            var result = await _attendanceService.MarkBulkAttendance(dto);
-            return Ok(new ApiResponse<System.Collections.Generic.List<AttendanceDto>>(result, "Bulk attendance marked successfully.", result.Count));
-        }
+            try
+            {
+                // In a real application, you would extract the UserId from the authenticated user's claims.
+                int userId = 1; // Defaulting to 1 for this example
 
-        [HttpGet("daily")]
-        public async Task<IActionResult> GetDailyAttendance([FromQuery] DateOnly date)
-        {
-            var result = await _attendanceService.GetDailyAttendance(date);
-            return Ok(new ApiResponse<AttendanceDailyDto>(result, "Daily attendance loaded successfully."));
-        }
-
-        [HttpGet("employee/{employeeId:guid}")]
-        public async Task<IActionResult> GetEmployeeMonthlyAttendance([FromRoute] Guid employeeId, [FromQuery] int month, [FromQuery] int year)
-        {
-            var result = await _attendanceService.GetEmployeeMonthlyAttendance(employeeId, month, year);
-            return Ok(new ApiResponse<System.Collections.Generic.List<AttendanceDto>>(result, "Employee monthly attendance loaded successfully.", result.Count));
+                var result = await _attendanceService.SaveAttendanceAsync(request, userId);
+                return Ok(new { success = true, message = "Attendance saved successfully.", data = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while saving attendance.", error = ex.Message });
+            }
         }
 
         [HttpGet("summary")]
-        public async Task<IActionResult> GetMonthlySummary([FromQuery] int month, [FromQuery] int year)
+        public async Task<IActionResult> GetAttendanceSummary(
+            [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate,
+            [FromQuery] string? shift)
         {
-            var result = await _attendanceService.GetMonthlySummary(month, year);
-            return Ok(new ApiResponse<System.Collections.Generic.List<AttendanceSummaryDto>>(result, "Monthly attendance summary loaded successfully.", result.Count));
-        }
-
-        [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdateAttendance([FromRoute] Guid id, [FromBody] AttendanceUpdateDto dto)
-        {
-            var result = await _attendanceService.UpdateAttendance(id, dto);
-            return Ok(new ApiResponse<AttendanceDto>(result, "Attendance record updated successfully."));
-        }
-
-        [HttpGet("range")]
-        public async Task<IActionResult> GetAttendanceByDateRange([FromQuery] DateOnly startDate, [FromQuery] DateOnly endDate)
-        {
-            var result = await _attendanceService.GetAttendanceByDateRange(startDate, endDate);
-            return Ok(new ApiResponse<System.Collections.Generic.List<AttendanceDto>>(result, "Attendance records for range loaded successfully.", result.Count));
-        }
-
-        [HttpPost("archive-manual")]
-        public async Task<IActionResult> ArchiveMonthlyAttendance(
-            [FromQuery] int month, 
-            [FromQuery] int year, 
-            [FromServices] IAttendanceRepository attendanceRepo,
-            [FromServices] IExcelExportService excelExportService)
-        {
-            var attendances = await attendanceRepo.GetAllMonthlyAttendance(month, year);
-            if (attendances == null || !attendances.Any())
+            try
             {
-                return BadRequest(new ApiResponse<string>(null, $"No attendance records found for {month}/{year}."));
+                if (!fromDate.HasValue || !toDate.HasValue)
+                    return BadRequest(new { success = false, message = "FromDate and ToDate are required." });
+
+                var result = await _attendanceService.GetAttendanceSummaryAsync(fromDate.Value, toDate.Value, shift);
+                return Ok(new { success = true, data = result });
             }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while retrieving attendance summary.", error = ex.Message });
+            }
+        }
 
-            var exportPath = await excelExportService.ExportAttendanceLogsAsync(attendances, month, year);
-            await attendanceRepo.DeleteAttendancesForMonthAsync(month, year);
+        [HttpGet("employee/{employeeId:int}/details")]
+        public async Task<IActionResult> GetEmployeeAttendanceDetails(
+            int employeeId,
+            [FromQuery] DateTime? fromDate,
+            [FromQuery] DateTime? toDate)
+        {
+            try
+            {
+                if (!fromDate.HasValue || !toDate.HasValue)
+                    return BadRequest(new { success = false, message = "FromDate and ToDate are required." });
 
-            return Ok(new ApiResponse<string>(exportPath, $"Successfully exported to {exportPath} and deleted DB records."));
+                var result = await _attendanceService.GetEmployeeAttendanceDetailsAsync(employeeId, fromDate.Value, toDate.Value);
+                return Ok(new { success = true, data = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while retrieving attendance details.", error = ex.Message });
+            }
+        }
+
+        [HttpPost("save")]
+        public async Task<IActionResult> SaveEmployeeAttendance([FromBody] SaveEmployeeAttendanceRequest request)
+        {
+            try
+            {
+                int userId = GetCurrentUserId();
+                var result = await _attendanceService.SaveEmployeeAttendanceAsync(request, userId);
+                return Ok(new { success = true, message = "Attendance saved successfully.", data = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while saving attendance.", error = ex.Message });
+            }
+        }
+
+        [HttpPut("{employeeId}")]
+        public async Task<IActionResult> UpdateAttendance(int employeeId, [FromBody] AttendanceRequest request)
+        {
+            try
+            {
+                int userId = 1; // Replace with authenticated user ID
+                var result = await _attendanceService.UpdateAttendanceAsync(employeeId, request, userId);
+                return Ok(new { success = true, message = "Attendance updated successfully.", data = result });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "An error occurred while updating attendance.", error = ex.Message });
+            }
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+            {
+                return userId;
+            }
+            return 1;
         }
     }
 }
